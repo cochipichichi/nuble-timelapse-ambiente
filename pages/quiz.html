@@ -1,32 +1,60 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>🧪 Quiz — Suelo & Erosión</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
-  <div class="header"><div class="logo">🧪 Quiz — Suelo & Erosión</div><div class="controls"><a class="toggle" href="../index.html">↩️ Volver</a></div></div>
-  <main class="grid" id="quiz"></main>
-  <section class="hero"><button class="btn ok" id="submit">Enviar</button><button class="btn" id="reset">Reiniciar</button><p id="score"></p></section>
-  <footer class="footer"><p>Proyecto Ñuble — Observatorio Ambiental Interactivo</p></footer>
-  <script src="../assets/js/logros.js"></script>
+  <div class="header">
+    <div class="logo">🧪 Quiz — Suelo & Erosión</div>
+    <div class="controls">
+      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
+      <a class="toggle" href="../index.html">↩️ Volver</a>
+    </div>
+  </div>
+  <main class="grid" role="main" id="quiz"></main>
+  <section class="hero">
+    <button class="btn ok" id="submit">✅ Enviar</button>
+    <button class="btn" id="reset">↩️ Reiniciar</button>
+    <p id="score"></p>
+  </section>
+
+  <footer class="footer" role="contentinfo">
+    <p>Proyecto Ñuble — Observatorio Ambiental Interactivo</p>
+    <p>belen.acpe@gmail.com · 📞 +56 9 6266 4960<br>
+    👨‍💻 Francisco Pinto — 📧 franciscoandresp@gmail.com · 📞 +56 9 2002 7992</p>
+    <p>Hecho con ❤️ para el Liceo Bicentenario de Excelencia Polivalente San Nicolás</p>
+  </footer>
+
+  <script src="../assets/js/shared.js"></script>
   <script>
-  const qs=[
+  const qs = [
     {q:'La erosión hídrica aumenta con…', opts:['Pendientes suaves','Pendientes pronunciadas','Suelos con buena cobertura vegetal'], a:1},
     {q:'Una práctica que reduce la degradación del suelo es…', opts:['Monocultivo continuo','Labranza cero y cobertura','Deforestación'], a:1},
     {q:'El caudal de un río suele aumentar por…', opts:['Lluvias intensas','Sequía prolongada','Menor infiltración'], a:0},
   ];
-  const root=document.getElementById('quiz');
+  const root = document.getElementById('quiz');
   qs.forEach((item,i)=>{
-    const div=document.createElement('div'); div.className='card';
-    div.innerHTML=`<h3>${i+1}. ${item.q}</h3>` + item.opts.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${o}</label><br>`).join('');
+    const div = document.createElement('div'); div.className='card';
+    div.innerHTML = `<h3>${i+1}. ${item.q}</h3>` + item.opts.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${o}</label><br>`).join('');
     root.appendChild(div);
   });
-  document.getElementById('submit').onclick=()=>{
-    let s=0; qs.forEach((item,i)=>{ const v=document.querySelector(`input[name="q${i}"]:checked`); if(v && Number(v.value)===item.a) s++; });
-    const msg=`Puntaje: ${s}/${qs.length}`; document.getElementById('score').textContent=msg; localStorage.setItem('quiz_score', msg); Logros.set(Logros.keys.QUIZ);
+
+  document.getElementById('submit').onclick = ()=>{
+    let s=0;
+    qs.forEach((item,i)=>{
+      const v = document.querySelector(`input[name="q${i}"]:checked`);
+      if(v && Number(v.value)===item.a) s++;
+    });
+    const msg = `Puntaje: ${s}/${qs.length}`;
+    document.getElementById('score').textContent = msg;
+    localStorage.setItem('quiz_score', msg);
   };
-  document.getElementById('reset').onclick=()=>{ localStorage.removeItem('quiz_score'); location.reload(); };
+  document.getElementById('reset').onclick = ()=>{
+    localStorage.removeItem('quiz_score'); location.reload();
+  };
   </script>
-</body></html>
+</body>
+</html>
