@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>📈 Datos — Caudales & Series</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">📈 Datos — Caudales</div>
+    <div class="controls">
+      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
+      <a class="toggle" href="../index.html">↩️ Volver</a>
+    </div>
+  </div>
+
+  <main class="hero" role="main">
+    <h1>Sube tu CSV</h1>
+    <p>Formato esperado: primera columna = fecha (YYYY-MM-DD), siguientes columnas = series (p. ej., caudal_m3s, lluvia_mm).</p>
+    <input type="file" id="file" accept=".csv">
+    <canvas id="chart" height="120"></canvas>
+  </main>
+
+  <section class="grid">
+    <article class="card">
+      <h3>Ejemplo rápido</h3>
+      <p>Descarga un CSV de ejemplo para probar.</p>
+      <a class="btn" href="../data/ejemplo_caudal.csv" download>⬇️ Descargar ejemplo</a>
+    </article>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <p>Proyecto Ñuble — Observatorio Ambiental Interactivo</p>
+    <p>belen.acpe@gmail.com · 📞 +56 9 6266 4960<br>
+    👨‍💻 Francisco Pinto — 📧 franciscoandresp@gmail.com · 📞 +56 9 2002 7992</p>
+    <p>Hecho con ❤️ para el Liceo Bicentenario de Excelencia Polivalente San Nicolás</p>
+  </footer>
+
+  <script src="../assets/js/shared.js"></script>
+  <script>
+  function parseCSV(text){
+    const lines = text.trim().split(/\r?\n/);
+    const headers = lines[0].split(',').map(h=>h.trim());
+    const rows = lines.slice(1).map(l=>l.split(',').map(x=>x.trim()));
+    return {headers, rows};
+  }
+  const fileInput = document.getElementById('file');
+  const ctx = document.getElementById('chart');
+  let chart;
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if(!file) return;
+    const text = await file.text();
+    const {headers, rows} = parseCSV(text);
+    const labels = rows.map(r=>r[0]);
+    const series = headers.slice(1).map((h, idx)=> ({
+      label: h,
+      data: rows.map(r=> Number(r[idx+1] || 0)),
+      borderWidth: 2,
+      tension: .2
+    }));
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: series },
+      options: {
+        responsive: true,
+        plugins:{ legend:{ position:'bottom' } },
+        scales:{ x:{ ticks:{ maxRotation:0, autoSkip:true } } }
+      }
+    });
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🎟️ Ticket de salida</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🎟️ Ticket de salida</div>
+    <div class="controls">
+      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
+      <a class="toggle" href="../index.html">↩️ Volver</a>
+    </div>
+  </div>
+  <main class="grid" role="main">
+    <article class="card">
+      <h3>1) Hoy aprendí que…</h3>
+      <textarea id="t1" rows="5" style="width:100%"></textarea>
+    </article>
+    <article class="card">
+      <h3>2) Una pregunta que me queda es…</h3>
+      <textarea id="t2" rows="5" style="width:100%"></textarea>
+    </article>
+    <article class="card">
+      <h3>3) ¿Cómo cuido mi entorno?</h3>
+      <textarea id="t3" rows="5" style="width:100%"></textarea>
+    </article>
+  </main>
+  <section class="hero">
+    <button class="btn ok" id="save">💾 Guardar</button>
+    <button class="btn" id="clear">🗑️ Limpiar</button>
+    <p id="status"></p>
+  </section>
+
+  <footer class="footer" role="contentinfo">
+    <p>Proyecto Ñuble — Observatorio Ambiental Interactivo</p>
+    <p>belen.acpe@gmail.com · 📞 +56 9 6266 4960<br>
+    👨‍💻 Francisco Pinto — 📧 franciscoandresp@gmail.com · 📞 +56 9 2002 7992</p>
+    <p>Hecho con ❤️ para el Liceo Bicentenario de Excelencia Polivalente San Nicolás</p>
+  </footer>
+
+  <script src="../assets/js/shared.js"></script>
+  <script>
+  const ids = ['t1','t2','t3'];
+  // restore
+  ids.forEach(id=>{ const v=localStorage.getItem('ticket_'+id); if(v) document.getElementById(id).value=v; });
+  document.getElementById('save').onclick = ()=>{
+    ids.forEach(id=> localStorage.setItem('ticket_'+id, document.getElementById(id).value));
+    document.getElementById('status').textContent='Guardado localmente ✅';
+  };
+  document.getElementById('clear').onclick = ()=>{
+    ids.forEach(id=> localStorage.removeItem('ticket_'+id));
+    location.reload();
+  };
+  </script>
+</body>
+</html>

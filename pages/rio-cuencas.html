@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🌊 Ríos y Cuencas — Ñuble</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="fullscreen">
+  <div class="toolbar">
+    <div class="title">🌊 Ríos y Cuencas</div>
+    <div class="controls">
+      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
+      <a class="toggle" href="../index.html">↩️ Volver</a>
+    </div>
+  </div>
+  <div class="mapwrap">
+    <div id="map"></div>
+  </div>
+
+<script src="../assets/js/shared.js"></script>
+<script>
+const map = L.map('map').setView([-36.75,-72.4], 8);
+
+// Base
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19, attribution:'© OpenStreetMap'
+}).addTo(map);
+
+// Simple educational markers from Andes ➜ Cobquecura
+const puntos = [
+  {name:'Cordillera de los Andes (Ñuble Alto)', lat:-36.83, lon:-71.5, desc:'Nacientes de ríos, mayor pendiente ➜ erosión potencial.'},
+  {name:'Río Ñuble — tramo medio', lat:-36.55, lon:-72.00, desc:'Caudales estacionales; monitoreo de sedimentos.'},
+  {name:'Río Itata', lat:-36.61, lon:-72.40, desc:'Cuenca principal que drena hacia el océano Pacífico.'},
+  {name:'Cobquecura (costa)', lat:-36.13, lon:-72.79, desc:'Desembocadura y zona costera: interacción mar-tierra.'},
+];
+puntos.forEach(p=>{
+  L.marker([p.lat, p.lon]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.desc}`);
+});
+
+// Educational polygon placeholder (approximate study corridor)
+const poly = L.polygon([
+  [-36.95,-71.6], [-36.20,-72.0], [-36.00,-72.9], [-36.30,-72.95]
+],{color:'#3fd37a', weight:2, fillOpacity:0.05}).addTo(map).bindPopup('Corredor Andes ➜ Mar (ilustrativo)');
+
+</script>
+</body>
+</html>
