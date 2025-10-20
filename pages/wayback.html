@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🧱 Esri Wayback — Comparación</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-side-by-side"></script>
+  <style>
+    .bar{position:absolute; top:10px; left:50%; transform:translateX(-50%); background:#0f1419e6; border:1px solid var(--outline); border-radius:12px; padding:8px; z-index:500}
+    .bar input{width:360px; max-width:42vw; background:#0f1419; color:#cde9ff; border:1px solid var(--outline); border-radius:8px; padding:6px; margin:2px 6px}
+    .bar small{color:#93a4b8; display:block}
+  </style>
+</head>
+<body class="fullscreen">
+  <div class="toolbar"><div class="title">🧱 Esri Wayback — Comparación</div><div class="controls"><a class="toggle" href="../index.html">↩️ Volver</a></div></div>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="bar">
+      <div>
+        <label>Izquierda URL XYZ:
+          <input id="leftUrl" placeholder="Pega aquí la URL de tiles (Wayback release XYZ)">
+        </label>
+      </div>
+      <div>
+        <label>Derecha URL XYZ:
+          <input id="rightUrl" placeholder="Pega aquí la URL de tiles (Wayback release XYZ)">
+        </label>
+      </div>
+      <small>Ejemplo de patrón XYZ: https://example/MapServer/tile/{z}/{y}/{x}?release=YYYYMMDD  (reemplaza con el endpoint real de Esri Wayback)</small>
+      <button class="btn" id="applyBtn">Aplicar</button>
+    </div>
+  </div>
+<script>
+const map=L.map('map').setView([-36.7,-72.3],10);
+let left=null, right=null, ctrl=null;
+// Fallback capas si no hay URLs Wayback pegadas aún
+const fallbackLeft = L.tileLayer('https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2018_3857/GoogleMapsCompatible/{z}/{x}/{y}.jpg',{attribution:'EOX S2 2018'}).addTo(map);
+const fallbackRight = L.tileLayer('https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/GoogleMapsCompatible/{z}/{x}/{y}.jpg',{attribution:'EOX S2 2020'}).addTo(map);
+ctrl=L.control.sideBySide(fallbackLeft,fallbackRight).addTo(map);
+
+document.getElementById('applyBtn').onclick=()=>{
+  const l = document.getElementById('leftUrl').value.trim();
+  const r = document.getElementById('rightUrl').value.trim();
+  try{
+    if(l){ map.removeLayer(fallbackLeft); }
+    if(r){ map.removeLayer(fallbackRight); }
+  }catch(e){}
+  if(ctrl){ ctrl.remove(); }
+  left = l ? L.tileLayer(l,{attribution:'Esri Wayback (izq)'}) : fallbackLeft;
+  right = r ? L.tileLayer(r,{attribution:'Esri Wayback (der)'}) : fallbackRight;
+  left.addTo(map); right.addTo(map);
+  ctrl=L.control.sideBySide(left,right).addTo(map);
+};
+</script>
+</body></html>
