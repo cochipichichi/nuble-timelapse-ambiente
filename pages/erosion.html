@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>⚠️ Riesgo de Erosión (beta)</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    .legend{position:absolute; bottom:14px; left:14px; background:#0f1419e6; border:1px solid var(--outline); border-radius:10px; padding:8px; color:#cde9ff}
+    .legend .b{display:flex; align-items:center; gap:6px; margin:4px 0}
+    .chip{width:14px; height:14px; border-radius:3px; display:inline-block}
+    .toolbar .controls select{background:#0f1419; color:#cde9ff; border:1px solid var(--outline); border-radius:8px; padding:6px}
+  </style>
+</head>
+<body class="fullscreen">
+  <div class="toolbar">
+    <div class="title">⚠️ Riesgo de Erosión (beta)</div>
+    <div class="controls">
+      <label>WMTS:
+        <select id="wmtsSel">
+          <option value="">(sin WMTS)</option>
+          <option value="erosion_wmts">Capa WMTS (placeholder)</option>
+        </select>
+      </label>
+      <a class="toggle" href="../index.html">↩️ Volver</a>
+    </div>
+  </div>
+  <div class="mapwrap"><div id="map"></div><div class="legend" id="legend">
+    <div class="b"><span class="chip" style="background:#3fd37a"></span> Bajo (≤ 0.33)</div>
+    <div class="b"><span class="chip" style="background:#ffd166"></span> Medio (0.34 – 0.66)</div>
+    <div class="b"><span class="chip" style="background:#ff6b6b"></span> Alto (≥ 0.67)</div>
+  </div></div>
+<script src="../assets/js/config.js"></script>
+<script>
+const map=L.map('map').setView([-36.7,-72.3],9);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
+// choropleth from placeholder GeoJSON
+fetch('../data/erosion_risk_placeholder.geojson').then(r=>r.json()).then(gj=>{
+  function color(v){
+    return v>=0.67 ? '#ff6b6b' : (v>=0.34 ? '#ffd166' : '#3fd37a');
+  }
+  L.geoJSON(gj,{
+    style:(f)=>({color:color(f.properties.riesgo), weight:2, fillOpacity:0.25}),
+    onEachFeature:(f,l)=> l.bindPopup(`<b>${f.properties.zona}</b><br>Riesgo: ${f.properties.riesgo}`)
+  }).addTo(map);
+});
+// optional WMTS overlay slot
+let wmtsLayer=null;
+function updateWMTS(){
+  const val=document.getElementById('wmtsSel').value;
+  if(wmtsLayer){ map.removeLayer(wmtsLayer); wmtsLayer=null; }
+  if(val){
+    const url=window.NUBLE_LAYERS[val];
+    // In many WMTS servers a templated XYZ might be exposed; this is a placeholder:
+    wmtsLayer = L.tileLayer(url,{opacity:0.5, attribution:'WMTS (definir fuente/licencia)'}).addTo(map);
+  }
+}
+document.getElementById('wmtsSel').onchange=updateWMTS;
+</script>
+</body></html>

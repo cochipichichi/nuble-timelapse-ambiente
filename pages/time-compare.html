@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>⏳ Comparación Temporal — S2 Cloudless</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-side-by-side"></script>
+  <style>
+    .bar{position:absolute; top:10px; left:50%; transform:translateX(-50%); background:#0f1419e6; border:1px solid var(--outline); border-radius:12px; padding:8px; z-index:500}
+    select{background:#0f1419; color:#cde9ff; border:1px solid var(--outline); border-radius:8px; padding:6px}
+  </style>
+</head>
+<body class="fullscreen">
+  <div class="toolbar"><div class="title">⏳ Comparación Temporal</div><div class="controls"><a class="toggle" href="../index.html">↩️ Volver</a></div></div>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="bar">
+      <label>Izquierda:
+        <select id="leftSel">
+          <option value="s2cloudless_2018">S2 Cloudless 2018</option>
+          <option value="s2cloudless_2020">S2 Cloudless 2020</option>
+        </select>
+      </label>
+      &nbsp;|&nbsp;
+      <label>Derecha:
+        <select id="rightSel">
+          <option value="s2cloudless_2020">S2 Cloudless 2020</option>
+          <option value="s2cloudless_2018">S2 Cloudless 2018</option>
+        </select>
+      </label>
+    </div>
+  </div>
+<script src="../assets/js/config.js"></script>
+<script>
+const map=L.map('map').setView([-36.7,-72.3],9);
+const layers={
+  s2cloudless_2018: L.tileLayer(window.NUBLE_LAYERS.s2cloudless_2018,{attribution:'EOX S2 Cloudless 2018'}),
+  s2cloudless_2020: L.tileLayer(window.NUBLE_LAYERS.s2cloudless_2020,{attribution:'EOX S2 Cloudless 2020'})
+};
+let left=layers.s2cloudless_2018.addTo(map);
+let right=layers.s2cloudless_2020.addTo(map);
+let ctrl=L.control.sideBySide(left,right).addTo(map);
+
+function updateSides(){
+  map.removeLayer(left); map.removeLayer(right); ctrl.remove();
+  left = layers[document.getElementById('leftSel').value].addTo(map);
+  right = layers[document.getElementById('rightSel').value].addTo(map);
+  ctrl = L.control.sideBySide(left,right).addTo(map);
+}
+document.getElementById('leftSel').onchange=updateSides;
+document.getElementById('rightSel').onchange=updateSides;
+</script>
+</body></html>
