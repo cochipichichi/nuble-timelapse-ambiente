@@ -1,9 +1,8 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>🪄 Evidencias — Antes/Después</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🪄 Evidencias — Swipe</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -11,22 +10,12 @@
   <script src="../assets/js/config.js"></script>
 </head>
 <body class="fullscreen">
-  <div class="toolbar">
-    <div class="title">🪄 Evidencias: Comparar capas</div>
-    <div class="controls">
-      <a class="toggle" href="./timelapse.html">🛰️ Timelapse</a>
-      <a class="toggle" href="../index.html">↩️ Volver</a>
-    </div>
-  </div>
-  <div class="mapwrap">
-    <div id="map"></div>
-  </div>
+  <div class="toolbar"><div class="title">🪄 Evidencias</div><div class="controls"><a class="toggle" href="./timelapse.html">🛰️ Timelapse</a><a class="toggle" href="../index.html">↩️ Volver</a></div></div>
+  <div class="mapwrap"><div id="map"></div></div>
 <script>
-const map = L.map('map').setView([-36.6,-72.3], 9);
-const left = L.tileLayer(window.NUBLE_LAYERS.s2cloudless, {attribution:'S2 Cloudless'}).addTo(map);
-// Example right layer: MODIS mid-2025
-const right = L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2025-07-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {attribution:'MODIS 2025'}).addTo(map);
-L.control.sideBySide(left, right).addTo(map);
+const map=L.map('map').setView([-36.6,-72.3],9);
+const left=L.tileLayer(window.NUBLE_LAYERS.s2cloudless,{attribution:'S2 Cloudless'}).addTo(map);
+const right=L.tileLayer('https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2025-07-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',{attribution:'MODIS 2025'}).addTo(map);
+L.control.sideBySide(left,right).addTo(map);
 </script>
-</body>
-</html>
+</body></html>

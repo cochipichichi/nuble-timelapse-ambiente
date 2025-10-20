@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>👁️ Catálogo 3D / AR</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>.grid-3d{max-width:1100px;margin:18px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.mv{width:100%;height:220px;background:#0f1419;border:1px solid var(--outline);border-radius:14px}.small{font-size:12px;color:var(--muted)}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">👁️ Catálogo 3D / AR</div><div class="controls"><a class="toggle" href="../index.html">↩️ Volver</a></div></div>
+  <main class="grid-3d" id="grid"></main>
+  <footer class="footer"><p>Proyecto Ñuble — Observatorio Ambiental Interactivo</p></footer>
+<script src="../assets/js/logros.js"></script>
+<script>
+const modelos=[
+  {file:'andes_acantilado.glb',  title:'Acantilado andino (erosión)'},
+  {file:'valle_rio_tramo.glb',   title:'Tramo de río en valle'},
+  {file:'costa_duna.glb',        title:'Duna / costa'},
+  {file:'bosque_pack.glb',       title:'Bosque (pack low poly)'},
+  {file:'cauce_meandrico.glb',   title:'Cauce meándrico'},
+  {file:'talud_inestable.glb',   title:'Talud inestable'},
+  {file:'terraza_marina.glb',    title:'Terraza marina'},
+  {file:'humedal_costero.glb',   title:'Humedal costero'},
+  {file:'deslizamiento_ladera.glb',title:'Deslizamiento en ladera'},
+  {file:'estero_andino.glb',     title:'Estero andino'}
+];
+const grid=document.getElementById('grid');
+modelos.forEach(m=>{
+  const p = `../assets/models/${m.file}`;
+  const card=document.createElement('article'); card.className='card';
+  card.innerHTML = `
+    <h3>🗺️ ${m.title}</h3>
+    <model-viewer class="mv" src="${p}" ar ar-modes="webxr scene-viewer quick-look" camera-controls touch-action="pan-y" exposure="0.9" environment-image="neutral" shadow-intensity="1"></model-viewer>
+    <p class="small">Archivo: <code>${m.file}</code> — coloca el .glb en <code>assets/models/</code>.</p>`;
+  grid.appendChild(card);
+});
+Logros.set(Logros.keys.MODELOS);
+</script>
+</body></html>
