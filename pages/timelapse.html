@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>🛰️ Timelapse Ñuble (MODIS GIBS)</title>
+  <title>🛰️ Timelapse Ñuble (MODIS + S2 Cloudless)</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../assets/js/config.js"></script>
 </head>
 <body class="fullscreen">
   <div class="toolbar">
@@ -14,6 +15,7 @@
     <div class="controls">
       <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
       <a class="toggle" href="../index.html">↩️ Volver</a>
+      <a class="toggle" href="./evidencias.html">🪄 Evidencias (Swipe)</a>
     </div>
   </div>
   <div class="mapwrap">
@@ -27,35 +29,37 @@
 
 <script src="../assets/js/shared.js"></script>
 <script>
-// Leaflet map
 const map = L.map('map',{zoomControl:true}).setView([-36.72, -72.3], 8);
 
-// Base map (OSM)
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:19, attribution:'© OpenStreetMap'
-}).addTo(map);
+// Base OSM
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
 
-// NASA GIBS MODIS Terra Corrected Reflectance (True Color) via WMTS
-// We'll request a fixed date each year (e.g., 01-15) to approximate a time-slice.
+// NASA GIBS MODIS
 let gibsLayer;
 const templ = (datestr)=> `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/${datestr}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`;
-
 function setYear(y){
-  const datestr = `${y}-07-01`; // mid-year snapshot to reduce seasonal variation
+  const datestr = `${y}-07-01`;
   const url = templ(datestr);
-  if(gibsLayer){ map.removeLayer(gibsLayer); }
-  gibsLayer = L.tileLayer(url, {
-    attribution: 'NASA GIBS / MODIS Terra',
-    maxZoom: 9, // GIBS Level 9 limit for this layer
-    opacity: 0.92
-  }).addTo(map);
+  if(gibsLayer) map.removeLayer(gibsLayer);
+  gibsLayer = L.tileLayer(url,{ attribution:'NASA GIBS / MODIS', maxZoom:9, opacity:0.9 }).addTo(map);
   document.getElementById('ylab').textContent = y;
 }
 setYear(2001);
+document.getElementById('year').addEventListener('input', e=> setYear(e.target.value));
 
-document.getElementById('year').addEventListener('input', (e)=>{
-  setYear(e.target.value);
-});
+// S2 cloudless (EOX)
+const s2 = L.tileLayer(window.NUBLE_LAYERS.s2cloudless, {attribution:'EOX Sentinel-2 cloudless', maxZoom:19, opacity:.9});
+
+// WorldCover placeholder (replace when you have a valid tiles URL)
+const worldCover = L.tileLayer(window.NUBLE_LAYERS.worldcover, {attribution:'WorldCover (placeholder)', maxZoom:19, opacity:0.6});
+
+const overlays = {
+  "🛰️ MODIS (anual)": gibsLayer,
+  "🛰️ S2 Cloudless": s2,
+  "🗺️ WorldCover (uso de suelo)": worldCover
+};
+const bases = { "🗺️ OSM": osm };
+L.control.layers(bases, overlays, {collapsed:true}).addTo(map);
 </script>
 </body>
 </html>

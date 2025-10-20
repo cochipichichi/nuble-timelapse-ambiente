@@ -6,21 +6,26 @@
   <title>📈 Datos — Caudales & Series</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="header">
     <div class="logo">📈 Datos — Caudales</div>
     <div class="controls">
-      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
       <a class="toggle" href="../index.html">↩️ Volver</a>
+      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
     </div>
   </div>
 
   <main class="hero" role="main">
     <h1>Sube tu CSV</h1>
-    <p>Formato esperado: primera columna = fecha (YYYY-MM-DD), siguientes columnas = series (p. ej., caudal_m3s, lluvia_mm).</p>
+    <p>Formato esperado: <code>fecha,serie1,serie2,...</code> (YYYY-MM-DD para la fecha).</p>
     <input type="file" id="file" accept=".csv">
-    <canvas id="chart" height="120"></canvas>
+    <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="btn" id="savepng">📥 Guardar gráfico (.png)</button>
+      <button class="btn ok" id="savepdf">📄 Generar reporte (.pdf)</button>
+    </div>
+    <canvas id="chart" height="120" style="margin-top:14px"></canvas>
   </main>
 
   <section class="grid">
@@ -31,7 +36,6 @@
     </article>
   </section>
 
-  <!-- Footer -->
   <footer class="footer" role="contentinfo">
     <p>Proyecto Ñuble — Observatorio Ambiental Interactivo</p>
     <p>belen.acpe@gmail.com · 📞 +56 9 6266 4960<br>
@@ -49,7 +53,7 @@
   }
   const fileInput = document.getElementById('file');
   const ctx = document.getElementById('chart');
-  let chart;
+  let chart, lastData = {labels:[],datasets:[]};
 
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files[0];
@@ -63,17 +67,35 @@
       borderWidth: 2,
       tension: .2
     }));
+    lastData = {labels, datasets: series};
     if(chart) chart.destroy();
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets: series },
-      options: {
-        responsive: true,
-        plugins:{ legend:{ position:'bottom' } },
-        scales:{ x:{ ticks:{ maxRotation:0, autoSkip:true } } }
-      }
-    });
+    chart = new Chart(ctx, { type: 'line', data: lastData, options:{ responsive:true, plugins:{ legend:{position:'bottom'} } } });
   });
+
+  document.getElementById('savepng').onclick = ()=>{
+    if(!chart) return;
+    const a = document.createElement('a');
+    a.href = chart.toBase64Image();
+    a.download = 'grafico_caudales.png';
+    a.click();
+  };
+
+  document.getElementById('savepdf').onclick = async ()=>{
+    if(!chart) return;
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:'landscape', unit:'pt', format:'a4'});
+    pdf.setFontSize(18);
+    pdf.text('Reporte de Caudales — Proyecto Ñuble', 40, 40);
+    pdf.setFontSize(12);
+    pdf.text('Resumen: gráfico generado desde CSV (fecha vs series).', 40, 60);
+    const img = chart.toBase64Image();
+    pdf.addImage(img, 'PNG', 40, 80, 760, 400);
+    pdf.text('Conclusiones (edita este espacio con tus observaciones):', 40, 500);
+    pdf.text('- ', 60, 520);
+    pdf.text('- ', 60, 540);
+    pdf.text('- ', 60, 560);
+    pdf.save('reporte_caudales.pdf');
+  };
   </script>
 </body>
 </html>

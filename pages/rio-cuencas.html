@@ -12,7 +12,6 @@
   <div class="toolbar">
     <div class="title">🌊 Ríos y Cuencas</div>
     <div class="controls">
-      <button class="toggle" data-toggle="hc">🌓 Alto contraste</button>
       <a class="toggle" href="../index.html">↩️ Volver</a>
     </div>
   </div>
@@ -20,30 +19,26 @@
     <div id="map"></div>
   </div>
 
-<script src="../assets/js/shared.js"></script>
 <script>
-const map = L.map('map').setView([-36.75,-72.4], 8);
+const map = L.map('map').setView([-36.7,-72.3], 8);
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
 
-// Base
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:19, attribution:'© OpenStreetMap'
-}).addTo(map);
+// Load GeoJSON
+async function loadLayer(url, style, onEach){
+  const res = await fetch(url); const gj = await res.json();
+  return L.geoJSON(gj,{style, onEachFeature:onEach}).addTo(map);
+}
+function styleCuencas(){ return {color:'#3fd37a', weight:2, fillOpacity:0.08}; }
+function onEach(f, layer){ if(f.properties && f.properties.name){ layer.bindPopup(`<b>${f.properties.name}</b>`); } }
 
-// Simple educational markers from Andes ➜ Cobquecura
-const puntos = [
-  {name:'Cordillera de los Andes (Ñuble Alto)', lat:-36.83, lon:-71.5, desc:'Nacientes de ríos, mayor pendiente ➜ erosión potencial.'},
-  {name:'Río Ñuble — tramo medio', lat:-36.55, lon:-72.00, desc:'Caudales estacionales; monitoreo de sedimentos.'},
-  {name:'Río Itata', lat:-36.61, lon:-72.40, desc:'Cuenca principal que drena hacia el océano Pacífico.'},
-  {name:'Cobquecura (costa)', lat:-36.13, lon:-72.79, desc:'Desembocadura y zona costera: interacción mar-tierra.'},
-];
-puntos.forEach(p=>{
-  L.marker([p.lat, p.lon]).addTo(map).bindPopup(`<b>${p.name}</b><br>${p.desc}`);
+loadLayer('../data/cuencas_itata_nuble.geojson', styleCuencas(), onEach);
+
+fetch('../data/estaciones_caudal.geojson').then(r=>r.json()).then(gj=>{
+  L.geoJSON(gj,{
+    pointToLayer:(f,latlng)=> L.circleMarker(latlng,{radius:6, color:'#5bd6ff', fillColor:'#5bd6ff', fillOpacity:.9, weight:2}),
+    onEachFeature:(f,l)=> l.bindPopup(`<b>${f.properties.estacion}</b><br>${f.properties.param}`)
+  }).addTo(map);
 });
-
-// Educational polygon placeholder (approximate study corridor)
-const poly = L.polygon([
-  [-36.95,-71.6], [-36.20,-72.0], [-36.00,-72.9], [-36.30,-72.95]
-],{color:'#3fd37a', weight:2, fillOpacity:0.05}).addTo(map).bindPopup('Corredor Andes ➜ Mar (ilustrativo)');
 
 </script>
 </body>

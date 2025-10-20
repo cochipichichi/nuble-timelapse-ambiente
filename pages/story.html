@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🧭 Ruta Andes → Valle → Costa</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    .story{max-width:1100px; margin:10px auto; display:grid; grid-template-columns: 1fr 360px; gap:14px;}
+    .story .panel{background:var(--card); border:1px solid var(--outline); border-radius:16px; padding:12px; max-height:60vh; overflow:auto}
+    .story .step{border-bottom:1px dashed var(--outline); padding:8px 0}
+    .story .step h3{margin:6px 0}
+    @media (max-width:900px){ .story{grid-template-columns:1fr} .story .panel{max-height:none} }
+    .q{margin-top:6px; font-size:14px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🧭 Story Map — Andes → Valle → Costa</div>
+    <div class="controls">
+      <a class="toggle" href="../index.html">↩️ Volver</a>
+    </div>
+  </div>
+  <div class="story">
+    <div id="map" style="height:65vh;border:1px solid var(--outline); border-radius:16px"></div>
+    <div class="panel" id="panel"></div>
+  </div>
+<script>
+const steps = [
+  {id:'andes', name:'Cordillera de los Andes', center:[-36.83,-71.5], zoom:10, text:'Nacientes y fuerte pendiente: erosión potencial elevada. Observa el relieve y la cobertura.', q:'¿Qué prácticas reducen la erosión en laderas?'},
+  {id:'valle', name:'Valle Central', center:[-36.6,-72.1], zoom:10, text:'Uso agrícola y cambio de cobertura. Compara S2 cloudless vs MODIS.', q:'¿Cómo influye la cobertura vegetal en la escorrentía?'}, 
+  {id:'itata', name:'Río Itata', center:[-36.61,-72.4], zoom:11, text:'Cuenca principal de drenaje. Estaciones de caudal y sedimentos.', q:'¿Qué variable te ayudaría a inferir crecidas?'},
+  {id:'costa', name:'Cobquecura (Costa)', center:[-36.13,-72.79], zoom:12, text:'Interacción mar-tierra: barras arenosas, dunas, dinámica costera.', q:'¿Qué evidencia buscarías para identificar erosión costera?'}
+];
+
+const map = L.map('map').setView(steps[0].center, steps[0].zoom);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+const s2 = L.tileLayer(window.NUBLE_LAYERS ? window.NUBLE_LAYERS.s2cloudless : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{opacity:0.75}).addTo(map);
+
+steps.forEach(s=>{
+  const m = L.marker(s.center).addTo(map).bindPopup(`<b>${s.name}</b><br>${s.text}`);
+});
+
+const panel = document.getElementById('panel');
+panel.innerHTML = steps.map((s,i)=>`
+  <div class="step">
+    <h3>${i+1}. ${s.name}</h3>
+    <p>${s.text}</p>
+    <p class="q">💡 ${s.q}</p>
+    <p><button class="btn" onclick="gotoStep(${i})">👀 Ir</button></p>
+  </div>
+`).join('');
+
+window.gotoStep = (i)=>{
+  const s = steps[i];
+  map.flyTo(s.center, s.zoom);
+};
+
+</script>
+<script src="../assets/js/config.js"></script>
+</body>
+</html>
